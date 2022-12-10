@@ -2,7 +2,7 @@
 
 #include "Entity.h"
 #include <vector>
-
+// ГЛАВНЫЙ ГЕРОЙ
 class Actor: public Move_Entity
 {
 private:
@@ -18,6 +18,7 @@ private:
     View camera;    // КАМЕРА
 
     bool is_dead = false;
+    bool is_bored = false;
 
     Sounding attack_left;
     Sounding attack_right;
@@ -25,9 +26,16 @@ private:
     Sounding attack_miss;
     Sounding level_new;
 
+    Sounding walk_road;
+    Sounding walk_sand;
     Sounding walk_grass;
     Sounding walk_water;
     Sounding walk_water_echo;
+
+    void update_health();
+    void update_damage();
+
+    void update_bored();
 
 public:
     Actor(String file, int X, int Y, int W, int H);
@@ -64,6 +72,7 @@ public:
     View& get_camera();
 
     void set_dead(bool isdead);
+    bool is_boring();
 
     void level_up();
 

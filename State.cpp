@@ -210,7 +210,7 @@ bool Loader::is_file_actor()
 void Loader::load_level(int level, std::string Cur_level[])
 {
     std::string need_level = "level" + std::to_string(level);
-    std::ifstream File("./gamedata/configs/level_spawns/" + need_level + ".txt");
+    std::ifstream File("./gamedata/configs/levels/" + need_level + ".txt");
     std::string tmp;
     int i = 0;
     while (!File.eof())
@@ -278,7 +278,7 @@ void Saver::save_spawn(int& level, std::string level_spawn[])
     for (int i = 0; i < MAP; i++)
     {
         File << level_spawn[i];
-        if (i != 44)
+        if (i != (MAP - 1))
         {
             File << '\n';
         }
@@ -294,7 +294,7 @@ void Saver::save_treasure(int& level, std::string level_treasure[])
     for (int i = 0; i <  MAP; i++)
     {
         File << level_treasure[i];
-        if (i != 44)
+        if (i != (MAP - 1))
         {
             File << '\n';
         }

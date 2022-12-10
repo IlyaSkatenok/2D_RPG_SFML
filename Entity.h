@@ -5,7 +5,7 @@
 #include <ctime>
 #include "Sounding.h"
 using namespace sf;
-
+// назейр я рейярспни х яопюирнл
 class Entity
 {
 protected:
@@ -21,7 +21,7 @@ public:
 
 };
 
-
+// ясымнярэ, йнрнпюъ пюяонкюцюеряъ он йннпдхмюрюл х лнфер мюмняхрэ/хлерэ спнм/гднпнбэе
 class Move_Entity : public Entity
 {
 protected:

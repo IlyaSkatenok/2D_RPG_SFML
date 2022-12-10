@@ -1,6 +1,7 @@
 #pragma once
 #include <SFML/Audio.hpp>
 using namespace sf;
+// назейр я гбсйнбшл астепнл х гбсйнл
 class Sounding
 {
 protected:

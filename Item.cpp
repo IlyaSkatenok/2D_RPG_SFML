@@ -3,8 +3,8 @@
 Sounding item_sounds[4] = {
 Sounding("./gamedata/sounds/items/Health_potion"),
 Sounding("./gamedata/sounds/items/Experience_potion"),
-Sounding("./gamedata/sounds/items/Armor_rune"),
-Sounding("./gamedata/sounds/items/Weapon_rune"),
+Sounding("./gamedata/sounds/items/rune_use"),
+Sounding("./gamedata/sounds/items/rune_drop"),
 };
 
 Entity artifacts = Entity("./gamedata/textures/tiles/tiles_artifacts.png", 1);
@@ -15,18 +15,21 @@ std::wstring descriptions[]
     L"Лечебное зелье\nЛечение зависит от вашей выносливости.\nБазовое лечение: 30",
     L"Лечебный элексир\nЛечение зависит от вашей выносливости.\nБазовое лечение: 45",
     L"Зелье опыта\nПовышает опыт до следующего уровня.",
-    L"Руна хрусталя\nПовышает урон, но понижает здоровье.\nУрон +20\nЗдоровье -20\nВНС -1",
-    L"Руна гранита\nПовышает здоровье, но понижает урон.\nУрон -12\nЗдоровье +20\nСИЛ +1\nВНС +1",
-
+    L"Волшебный камень\nВ нём заключена большая сила.",
+    L"Руна хрусталя\nПовышает урон.\nУрон +20\nЗдоровье -20\nВНС -1",
+    L"Руна гранита\nПовышает здоровье.\nУрон -12\nЗдоровье +20\nВНС +2",
+    L"Руна силы\nПовышает силу.\nСИЛ +2",
+    L"Руна удачи\nПовышает удачу.\nУДЧ +2",
+    L"Руна ловкости\nПовышает ловкость.\nЛВК +2",
+    L"Руна выносливости\nПовышает выносливость.\nВНС +2",
 };
 
 
-Item::Item(std::wstring name, bool usable, bool can_belt, int points)
+Item::Item(std::wstring name, bool usable, bool can_belt)
 {
     this->name = name;
     this->usable = usable;
     this->can_belt = can_belt;
-    this->points = points;
 }
 
 Item::~Item()
@@ -62,45 +65,46 @@ Entity& Item::get_entity()
     return *logo_item;
 }
 
+void Item::re_use(Actor& hero)
+{
+
+}
+
 //----------------------------------------------------------------------------
-Health_potion::Health_potion() : Item(L"Лечебное зелье",1, 0, 30)
+Health_potion::Health_potion() : Item(L"Лечебное зелье",1, 0)
 {
     used = &item_sounds[0];
     descr_item = &descriptions[0];
     logo_item = &potions;
 }
 
-Health_potion::~Health_potion()
+void Health_potion::use(Actor& hero, bool is_silent)
 {
-    //dtor
-}
-
-void Health_potion::use(Actor& hero)
-{
-    hero.add_health(points + hero.get_endurance() / 3);
-    play_sound();
+    hero.add_health(30 + hero.get_endurance() / 3);
+    if (!is_silent)
+    {
+        play_sound();
+    }
 }
 void Health_potion::set_need_sprite()
 {
     logo_item->get_sprite().setTextureRect(IntRect(90,0,90,130));
 }
 //----------------------------------------------------------------------------
-Big_Health_potion::Big_Health_potion() : Item(L"Лечебный элексир",1, 0, 45)
+Big_Health_potion::Big_Health_potion() : Item(L"Лечебный элексир",1, 0)
 {
     used = &item_sounds[0];
     descr_item = &descriptions[1];
     logo_item = &potions;
 }
 
-Big_Health_potion::~Big_Health_potion()
+void Big_Health_potion::use(Actor& hero, bool is_silent)
 {
-    //dtor
-}
-
-void Big_Health_potion::use(Actor& hero)
-{
-    hero.add_health(points + hero.get_endurance() / 3);
-    play_sound();
+    hero.add_health(45 + hero.get_endurance() / 3);
+    if (!is_silent)
+    {
+        play_sound();
+    }
 }
 
 void Big_Health_potion::set_need_sprite()
@@ -110,107 +114,213 @@ void Big_Health_potion::set_need_sprite()
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-Experience_potion::Experience_potion() : Item(L"Зелье опыта",1, 0, 1)
+Experience_potion::Experience_potion() : Item(L"Зелье опыта",1, 0)
 {
     used = &item_sounds[1];
     descr_item = &descriptions[2];
     logo_item = &potions;
 }
 
-Experience_potion::~Experience_potion()
-{
-    //dtor
-}
-
-void Experience_potion::use(Actor& hero)
+void Experience_potion::use(Actor& hero, bool is_silent)
 {
     hero.set_experience(hero.get_max_experience());
-    play_sound();
+    if (!is_silent)
+    {
+        play_sound();
+    }
 }
 
 void Experience_potion::set_need_sprite()
 {
     logo_item->get_sprite().setTextureRect(IntRect(0,0,90,130));
 }
+
 //----------------------------------------------------------------------------
-Armor_rune::Armor_rune() : Item (L"Руна защиты",1, 1, 10)
+Rune_granite::Rune_granite() : Item (L"Руна гранита",1, 1)
 {
     used = &item_sounds[2];
-    descr_item = &descriptions[3];
+    descr_item = &descriptions[5];
     logo_item = &artifacts;
 }
 
-Armor_rune::~Armor_rune()
+void Rune_granite::use(Actor& hero, bool is_silent)
 {
-    //dtor
+    hero.set_bonus_damage(hero.get_bonus_damage() - 12);
+    hero.set_bonus_health(hero.get_bonus_health() + 20);
+    hero.set_endurance(hero.get_endurance() + 2);
+    if (!is_silent)
+    {
+        play_sound();
+    }
 }
 
-void Armor_rune::use(Actor& hero)
+void Rune_granite::re_use(Actor& hero)
 {
-    hero.set_bonus_health(hero.get_bonus_health() + points);
-    play_sound();
+    hero.set_bonus_damage(hero.get_bonus_damage() + 12);
+    hero.set_bonus_health(hero.get_bonus_health() - 20);
+    hero.set_endurance(hero.get_endurance() + 2);
+    item_sounds[3].play_sound();
 }
 
-void Armor_rune::re_use(Actor& hero)
-{
-    hero.set_bonus_health(hero.get_bonus_health() - points);
-    play_sound();
-}
-
-void Armor_rune::set_need_sprite()
+void Rune_granite::set_need_sprite()
 {
     logo_item->get_sprite().setTextureRect(IntRect(0,0,34,44));
 }
 
+
 //----------------------------------------------------------------------------
-Weapon_rune::Weapon_rune() : Item (L"Руна урона",1, 1, 5)
+Rune_crystal::Rune_crystal() : Item (L"Руна хрусталя",1, 1)
 {
-    used = &item_sounds[3];
+    used = &item_sounds[2];
     descr_item = &descriptions[4];
     logo_item = &artifacts;
 }
 
-Weapon_rune::~Weapon_rune()
+void Rune_crystal::use(Actor& hero, bool is_silent)
 {
-    //dtor
+    hero.set_bonus_damage(hero.get_bonus_damage() + 20);
+    hero.set_bonus_health(hero.get_bonus_health() - 20);
+    hero.set_endurance(hero.get_endurance() - 1);
+    if (!is_silent)
+    {
+        play_sound();
+    }
 }
 
-void Weapon_rune::use(Actor& hero)
+void Rune_crystal::re_use(Actor& hero)
 {
-    hero.set_bonus_damage(hero.get_bonus_damage() + points);
-    play_sound();
+    hero.set_bonus_damage(hero.get_bonus_damage() - 20);
+    hero.set_bonus_health(hero.get_bonus_health() + 20);
+    hero.set_endurance(hero.get_endurance() + 1);
+    item_sounds[3].play_sound();
 }
 
-void Weapon_rune::re_use(Actor& hero)
-{
-    hero.set_bonus_damage(hero.get_bonus_damage() - points);
-    play_sound();
-}
-
-void Weapon_rune::set_need_sprite()
+void Rune_crystal::set_need_sprite()
 {
     logo_item->get_sprite().setTextureRect(IntRect(34,0,31,44));
 }
-
 //----------------------------------------------------------------------------
-Golden_key::Golden_key() : Item (L"Золотой ключ",0, 0, 0)
+Rune_strength::Rune_strength() : Item (L"Руна силы",1, 1)
 {
-    used = &item_sounds[1];
-    descr_item = &descriptions[4];
+    used = &item_sounds[2];
+    descr_item = &descriptions[6];
     logo_item = &artifacts;
 }
 
-Golden_key::~Golden_key()
+void Rune_strength::use(Actor& hero, bool is_silent)
 {
-    //dtor
+    hero.set_strength(hero.get_strength() + 2);
+    if (!is_silent)
+    {
+        play_sound();
+    }
 }
 
-void Golden_key::use(Actor& hero)
+void Rune_strength::re_use(Actor& hero)
 {
-
+    hero.set_strength(hero.get_strength() - 2);
+    item_sounds[3].play_sound();
 }
 
-void Golden_key::set_need_sprite()
+void Rune_strength::set_need_sprite()
 {
     logo_item->get_sprite().setTextureRect(IntRect(65,0,37,44));
+}
+//----------------------------------------------------------------------------
+Rune_luck::Rune_luck() : Item (L"Руна удачи",1, 1)
+{
+    used = &item_sounds[2];
+    descr_item = &descriptions[7];
+    logo_item = &artifacts;
+}
+
+void Rune_luck::use(Actor& hero, bool is_silent)
+{
+    hero.set_luck(hero.get_luck() + 2);
+    if (!is_silent)
+    {
+        play_sound();
+    }
+}
+
+void Rune_luck::re_use(Actor& hero)
+{
+    hero.set_luck(hero.get_luck() - 2);
+    item_sounds[3].play_sound();
+}
+
+void Rune_luck::set_need_sprite()
+{
+    logo_item->get_sprite().setTextureRect(IntRect(102,0,32,44));
+}
+//----------------------------------------------------------------------------
+Rune_endurance::Rune_endurance() : Item (L"Руна выносливости",1, 1)
+{
+    used = &item_sounds[2];
+    descr_item = &descriptions[9];
+    logo_item = &artifacts;
+}
+
+void Rune_endurance::use(Actor& hero, bool is_silent)
+{
+    hero.set_endurance(hero.get_endurance() + 2);
+    if (!is_silent)
+    {
+        play_sound();
+    }
+}
+
+void Rune_endurance::re_use(Actor& hero)
+{
+    hero.set_endurance(hero.get_endurance() - 2);
+    item_sounds[3].play_sound();
+}
+
+void Rune_endurance::set_need_sprite()
+{
+    logo_item->get_sprite().setTextureRect(IntRect(134,0,39,44));
+}
+//----------------------------------------------------------------------------
+Rune_agility::Rune_agility() : Item (L"Руна ловкости",1, 1)
+{
+    used = &item_sounds[2];
+    descr_item = &descriptions[8];
+    logo_item = &artifacts;
+}
+
+void Rune_agility::use(Actor& hero, bool is_silent)
+{
+    hero.set_agility(hero.get_agility() + 2);
+    if (!is_silent)
+    {
+        play_sound();
+    }
+}
+
+void Rune_agility::re_use(Actor& hero)
+{
+    hero.set_agility(hero.get_agility() - 2);
+    item_sounds[3].play_sound();
+}
+
+void Rune_agility::set_need_sprite()
+{
+    logo_item->get_sprite().setTextureRect(IntRect(173,0,35,44));
+}
+//----------------------------------------------------------------------------
+Magic_stone::Magic_stone() : Item (L"Волшебный камень",0, 0)
+{
+    used = &item_sounds[1];
+    descr_item = &descriptions[3];
+    logo_item = &artifacts;
+}
+
+void Magic_stone::use(Actor& hero, bool is_silent)
+{
+
+}
+
+void Magic_stone::set_need_sprite()
+{
+    logo_item->get_sprite().setTextureRect(IntRect(207,0,34,44));
 }

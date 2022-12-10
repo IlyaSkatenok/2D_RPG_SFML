@@ -1,6 +1,5 @@
 #include "Entity.h"
 
-
 Entity::Entity() {}
 
 Entity::Entity(const String file, int origin)

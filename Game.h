@@ -16,7 +16,7 @@
 #include "State.h"
 using namespace sf;
 
-// Описание работы с окном
+// РАБОТА С ОКНОМ И ИГРОЙ
 class Game
 {
 private:
@@ -26,7 +26,7 @@ private:
     Clock clock;
     float delta;
 
-    Entity tiles = Entity("./gamedata/textures/tiles/TILES.png");
+    Entity tiles = Entity("./gamedata/textures/tiles/tiles_big.png");
     Entity tiles_treasure = Entity("./gamedata/textures/tiles/TILES_TREASURE.png");
 
     void initWindow();
@@ -146,14 +146,15 @@ public:
     void choose_skill(bool side);
     void choose_item(bool side);
     void choose_belt(bool side);
-    bool add_belt();
     void pull_belt();
 
-
+    bool add_belt();
+    void add_belt_load(Item* rune);
     void add_item(Item* loot);
     void open_chest(int rander);
 
     char get_tile_walk();
+    char get_tile_walk(float x, float y);
 
 
     void updateDelta();

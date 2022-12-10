@@ -2,7 +2,7 @@
 #include <iostream>
 
 #define CONST_HEALTH 90
-
+#define CONST_DAMAGE 15
 Actor::Actor(String file, int X, int Y, int W, int H):Move_Entity(file, 1, X,Y,W,H, 0,0,0)
 {
     damage = 15;
@@ -19,6 +19,8 @@ Actor::Actor(String file, int X, int Y, int W, int H):Move_Entity(file, 1, X,Y,W
     attack_miss.set_sound("./gamedata/sounds/actor/attack_miss");
     level_new.set_sound("./gamedata/sounds/actor/level_up");
 
+    walk_road.set_sound("./gamedata/sounds/actor/walk_road");
+    walk_sand.set_sound("./gamedata/sounds/actor/walk_sand");
     walk_grass.set_sound("./gamedata/sounds/actor/walk_grass");
     walk_water.set_sound("./gamedata/sounds/actor/walk_water");
     walk_water_echo.set_sound("./gamedata/sounds/actor/walk_water_echo");
@@ -26,6 +28,50 @@ Actor::Actor(String file, int X, int Y, int W, int H):Move_Entity(file, 1, X,Y,W
 
 Actor::~Actor()
 {
+
+}
+
+void Actor::update_health()
+{
+    max_health = CONST_HEALTH + 5 * strength + 2 * endurance + bonus_health;
+    if (health > max_health)
+    {
+        health = max_health;
+    }
+    update_bored();
+}
+
+void Actor::update_damage()
+{
+    damage = CONST_DAMAGE + 3.15 * strength + bonus_damage;
+    update_bored();
+}
+
+void Actor::update_bored()
+{
+    bool temp_bored = is_bored;
+    if (damage < CONST_DAMAGE || max_health < CONST_HEALTH || luck < 0 || strength < 0 || agility < 0 || endurance < 0)
+    {
+        is_bored = true;
+    }
+    else
+    {
+        is_bored = false;
+    }
+
+    if (is_bored != temp_bored)
+    {
+        if (is_bored)
+        {
+            bonus_damage -= 5;
+            bonus_health -= 12;
+        }
+        else
+        {
+            bonus_damage += 5;
+            bonus_health += 12;
+        }
+    }
 
 }
 
@@ -49,33 +95,28 @@ void Actor::set_skills(int luck, int strength, int agility, int endurance)
 void Actor::set_luck(int luck)
 {
     this->luck = luck;
+    this->update_bored();
 }
 void Actor::set_strength(int strength)
 {
-    bool maxer = (health == max_health);
     this->strength = strength;
-    this->max_health = CONST_HEALTH + 5 * this->strength + 2 * this->endurance + bonus_health;
-    this->damage = 15 + 3.15 * this->strength + bonus_damage;
+    this->update_health();
+    this->update_damage();
 
-    if (maxer)
-    {
-        health = max_health;
-    }
+    this->update_bored();
 }
 void Actor::set_agility(int agility)
 {
     this->agility = agility;
+    this->update_bored();
 }
 void Actor::set_endurance(int endurance)
 {
-    bool maxer = (health == max_health);
     this->endurance = endurance;
-    this->max_health = CONST_HEALTH + 5 * this->strength + 2 * this->endurance + bonus_health;
+    this->update_health();
 
-    if (maxer)
-    {
-        health = max_health;
-    }
+    this->update_bored();
+
 }
 
 int Actor::get_luck()
@@ -145,15 +186,14 @@ int Actor::get_bonus_health()
 void Actor::set_bonus_damage(int dmg)
 {
     bonus_damage = dmg;
-    this->damage = 15 + 3.15 * this->strength + bonus_damage;
-
+    this->update_damage();
 }
 
 void Actor::set_bonus_health(int heal)
 {
     bool maxer = (health == max_health);
     bonus_health = heal;
-    this->max_health = CONST_HEALTH + 5 * this->strength + 2 * this->endurance + bonus_health;
+    this->update_health();
 
     if (maxer)
     {
@@ -335,17 +375,29 @@ void Actor::move(float delta, char material_walk)
         {
             switch(material_walk)
             {
-            case 'b':
+            case '-':
                 if(walk_grass.get_sound().getStatus() == Sound::Status::Stopped)
                 {
                     walk_grass.play_sound();
                 }
                 break;
-            case '-':
+            case 'w':
                 if(walk_water.get_sound().getStatus() == Sound::Status::Stopped)
                 {
                     walk_water.play_sound();
                     walk_water_echo.play_sound();
+                }
+                break;
+            case 's':
+                if(walk_sand.get_sound().getStatus() == Sound::Status::Stopped)
+                {
+                    walk_sand.play_sound();
+                }
+                break;
+            case 'r':
+                if(walk_road.get_sound().getStatus() == Sound::Status::Stopped)
+                {
+                    walk_road.play_sound();
                 }
                 break;
             }
@@ -362,13 +414,13 @@ int Actor::attack(bool left)
     if (left)
     {
         attack_damage = damage + 1.45 * agility;
-        miss_chance = 17 - 0.5 * luck - 1.5 * agility;
+        miss_chance = 17 - 0.65 * luck - 1.5 * agility;
         attack_sound = 1;
     }
     else
     {
         attack_damage = 1.1 * damage + 1.5 * strength + 1.25 * endurance;
-        miss_chance = 31 - 0.75 * luck - 1 * agility;
+        miss_chance = 31 - 1 * luck - 1 * agility;
         attack_sound = 2;
     }
 
@@ -377,7 +429,7 @@ int Actor::attack(bool left)
         attack_damage = 0;
         attack_sound = 0;
     }
-    if (luck > (rand() % 100) && attack_damage)
+    if (luck > (rand() % 75) && attack_damage)
     {
         attack_damage += attack_damage / 3;
         attack_sound = 3;
@@ -400,4 +452,9 @@ int Actor::attack(bool left)
     }
 
     return attack_damage;
+}
+
+bool Actor::is_boring()
+{
+    return is_bored;
 }

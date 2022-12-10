@@ -44,10 +44,8 @@ Game::Game()
 
 Game::~Game()
 {
-    //this->save_actor();
     saver.save_settings(volume_level, volume_level_ambient, is_play_ambient);
     delete this->window;
-
 }
 
 void Game::set_sounds()
@@ -67,15 +65,15 @@ void Game::updateEvents()
         }
         if (event.type == Event::KeyPressed && !this->was_pressed)
         {
-            if (event.key.code == Keyboard::Z)
+            if (event.key.code == Keyboard::Z && is_inventory_items)
             {
                 choose_belt(1);
             }
-            if (event.key.code == Keyboard::X)
+            if (event.key.code == Keyboard::X && is_inventory_items)
             {
                 choose_belt(0);
             }
-            if (event.key.code == Keyboard::C)
+            if (event.key.code == Keyboard::C && is_inventory_items)
             {
                 pull_belt();
             }
@@ -99,6 +97,10 @@ void Game::updateEvents()
                         is_paused = !is_paused;
                         set_pause(is_paused);
                     }
+                }
+                if (!lvl)
+                {
+                    lvl = -1;
                 }
             }
 
@@ -276,27 +278,144 @@ void Game::load_actor()
     File >> temp; ACTOR.set_level(temp);
     File >> temp ; ACTOR.set_level_points(temp);
 
-    File >> temp;
+    File.close();
+
+    std::ifstream File2("./gamedata/configs/actor_items.txt");
+
+    File2 >> temp;
+    for (uint16_t i = 0; i < temp; i++){ inventory_items.push_back(new Magic_stone()); }
+    File2 >> temp;
     for (uint16_t i = 0; i < temp; i++){ inventory_items.push_back(new Health_potion()); }
-    File >> temp;
+    File2 >> temp;
     for (uint16_t i = 0; i < temp; i++){ inventory_items.push_back(new Big_Health_potion()); }
-    File >> temp;
-    for (uint16_t i = 0; i < temp; i++){ inventory_items.push_back(new Armor_rune()); }
-    File >> temp;
-    for (uint16_t i = 0; i < temp; i++){ inventory_items.push_back(new Weapon_rune()); }
-    File >> temp;
-    for (uint16_t i = 0; i < temp; i++){ inventory_items.push_back(new Golden_key()); }
-    File >> temp;
+    File2 >> temp;
     for (uint16_t i = 0; i < temp; i++){ inventory_items.push_back(new Experience_potion()); }
+    File2 >> temp;
+    for (uint16_t i = 0; i < temp; i++){ inventory_items.push_back(new Rune_granite()); }
+    File2 >> temp;
+    for (uint16_t i = 0; i < temp; i++){ inventory_items.push_back(new Rune_crystal()); }
+    File2 >> temp;
+    for (uint16_t i = 0; i < temp; i++){ inventory_items.push_back(new Rune_strength()); }
+    File2 >> temp;
+    for (uint16_t i = 0; i < temp; i++){ inventory_items.push_back(new Rune_luck()); }
+    File2 >> temp;
+    for (uint16_t i = 0; i < temp; i++){ inventory_items.push_back(new Rune_endurance()); }
+    File2 >> temp;
+    for (uint16_t i = 0; i < temp; i++){ inventory_items.push_back(new Rune_agility()); }
+
+    File2.close();
 
     std::sort(inventory_items.begin(), inventory_items.end(), [](Item* a, Item* b)
                          {return a->get_name() > b->get_name();}
                          );
     item_number = inventory_items.size() - 1;
+
+    std::ifstream File3("./gamedata/configs/actor_belt.txt");
+
+    File3 >> temp;
+    int temp_temp = temp;
+    Item* temp_item;
+    for (int i = 0; i < temp_temp; i++)
+    {
+        File3 >> temp;
+        switch(temp)
+        {
+        case 0:
+            temp_item = new Rune_granite();
+            break;
+        case 1:
+            temp_item = new Rune_crystal();
+            break;
+        case 2:
+            temp_item = new Rune_strength();
+            break;
+        case 3:
+            temp_item = new Rune_luck();
+            break;
+        case 4:
+            temp_item = new Rune_endurance();
+            break;
+        case 5:
+            temp_item = new Rune_agility();
+            break;
+        default:
+            temp_item = new Rune_luck();
+            break;
+        }
+        this->add_belt_load(temp_item);
+    }
+
+    File3.close();
+
+
 }
 
 void Game::save_actor()
 {
+    std::wstring temp_wstr;
+    std::string temp_str;
+
+    std::ofstream File3("./gamedata/configs/actor_belt.txt");
+
+    File3 << inventory_belt.size() << '\n';
+    for (int i = 0; i < inventory_belt.size(); i++)
+    {
+        temp_wstr = inventory_belt[i]->get_name();
+        if (temp_wstr == L"Руна гранита")
+        {
+            temp_str = "0";
+        }
+        else if(temp_wstr == L"Руна хрусталя")
+        {
+            temp_str = "1";
+        }
+        else if(temp_wstr == L"Руна силы")
+        {
+            temp_str = "2";
+        }
+        else if(temp_wstr == L"Руна удачи")
+        {
+            temp_str = "3";
+        }
+        else if(temp_wstr == L"Руна выносливости")
+        {
+            temp_str = "4";
+        }
+        else
+        {
+            temp_str = "5";
+        }
+        File3 << temp_str;
+        if (i != inventory_belt.size() - 1)
+        {
+            File3 << '\n';
+        }
+    }
+
+    File3.close();
+
+    std::ofstream File2("./gamedata/configs/actor_items.txt");
+
+    File2 << std::count_if(inventory_items.begin(), inventory_items.end(), [](Item* obj) {return (obj->get_name() == L"Волшебный камень");}) << '\n';
+    File2 << std::count_if(inventory_items.begin(), inventory_items.end(), [](Item* obj) {return (obj->get_name() == L"Лечебное зелье");}) << '\n';
+    File2 << std::count_if(inventory_items.begin(), inventory_items.end(), [](Item* obj) {return (obj->get_name() == L"Лечебный элексир");}) << '\n';
+    File2 << std::count_if(inventory_items.begin(), inventory_items.end(), [](Item* obj) {return (obj->get_name() == L"Зелье опыта");}) << '\n';
+    File2 << std::count_if(inventory_items.begin(), inventory_items.end(), [](Item* obj) {return (obj->get_name() == L"Руна гранита");}) << '\n';
+    File2 << std::count_if(inventory_items.begin(), inventory_items.end(), [](Item* obj) {return (obj->get_name() == L"Руна хрусталя");}) << '\n';
+    File2 << std::count_if(inventory_items.begin(), inventory_items.end(), [](Item* obj) {return (obj->get_name() == L"Руна силы");}) << '\n';
+    File2 << std::count_if(inventory_items.begin(), inventory_items.end(), [](Item* obj) {return (obj->get_name() == L"Руна удачи");}) << '\n';
+    File2 << std::count_if(inventory_items.begin(), inventory_items.end(), [](Item* obj) {return (obj->get_name() == L"Руна выносливости");}) << '\n';
+    File2 << std::count_if(inventory_items.begin(), inventory_items.end(), [](Item* obj) {return (obj->get_name() == L"Руна ловкости");});
+
+    File2.close();
+
+    belt_number = 0;
+    while(inventory_belt.size())
+    {
+        pull_belt();
+    }
+
+
     std::ofstream File("./gamedata/configs/actor.txt");
 
     int temp; // ЛУВС
@@ -310,14 +429,7 @@ void Game::save_actor()
     File << ACTOR.get_level() << ' ';
     File << ACTOR.get_level_points() << '\n';
 
-    File << std::count_if(inventory_items.begin(), inventory_items.end(), [](Item* obj) {return (obj->get_name() == L"Лечебное зелье");}) << '\n';
-    File << std::count_if(inventory_items.begin(), inventory_items.end(), [](Item* obj) {return (obj->get_name() == L"Большое лечебное зелье");}) << '\n';
-    File << std::count_if(inventory_items.begin(), inventory_items.end(), [](Item* obj) {return (obj->get_name() == L"Руна защиты");}) << '\n';
-    File << std::count_if(inventory_items.begin(), inventory_items.end(), [](Item* obj) {return (obj->get_name() == L"Руна урона");}) << '\n';
-    File << std::count_if(inventory_items.begin(), inventory_items.end(), [](Item* obj) {return (obj->get_name() == L"Золотой ключ");}) << '\n';
-    File << std::count_if(inventory_items.begin(), inventory_items.end(), [](Item* obj) {return (obj->get_name() == L"Зелье опыта");});
-
-
+    File.close();
 }
 
 void Game::fill_all_spawn()
@@ -336,16 +448,27 @@ void Game::fill_all_spawn()
 
 char Game::get_tile_walk()
 {
-    return Cur_level[int(ACTOR.get_x() / 64)][int(ACTOR.get_y() / 64)];
+    return Cur_level[int(ACTOR.get_y() / 64)][int(ACTOR.get_x() / 64)];
+}
+
+char Game::get_tile_walk(float x, float y)
+{
+    return Cur_level[int(y / 64)][int(x / 64)];
 }
 
 bool Game::collision()
 {
+    // ВЫХОД ЗА КАРТУ
+    if ((ACTOR.get_x() < 64) || ACTOR.get_x() > (64 * MAP) || (ACTOR.get_y() < 64) || (ACTOR.get_y() > (64 * MAP)))
+    {
+        return true;
+    }
+
     for (float i = ACTOR.get_y() / 64; i < (ACTOR.get_y() + ACTOR.get_h()) / 64; i++)
     {
         for (float j = ACTOR.get_x() / 64; j < (ACTOR.get_x() + ACTOR.get_w()) / 64; j++)
         {
-            if (Cur_level[int(i)][int(j)] == 'b')
+            if (Cur_level[int(i)][int(j)] == 'b' || Cur_level[int(i)][int(j)] == 'd')
                 {
                     std::cout << i << "<--->" << j << std:: endl;
                     return true;
@@ -387,13 +510,32 @@ void Game::show_map()
         {
                 for (int j = 0; j < MAP; j++)
                 {
-                    if (Cur_level[i][j] == '-')
+                    switch(Cur_level[i][j])
                     {
-                        tiles.get_sprite().setTextureRect(IntRect(0,0,64,64));
-                    }
-                    if (Cur_level[i][j] == 'b')
-                    {
-                        tiles.get_sprite().setTextureRect(IntRect(64,0,64,64));
+        // ЗЕМЛЯ
+                    case '-':
+                        tiles.get_sprite().setTextureRect(IntRect(0,1,70,70));
+                        break;
+        // КУСТ
+                    case 'b':
+                        tiles.get_sprite().setTextureRect(IntRect(68,1,70,70));
+                        break;
+        // ВОДА
+                    case 'w':
+                        tiles.get_sprite().setTextureRect(IntRect(138,1,70,70));
+                        break;
+        // ГЛУБОКАЯ ВОДА
+                    case 'd':
+                        tiles.get_sprite().setTextureRect(IntRect(209,1,70,70));
+                        break;
+        // ПЕСОК
+                    case 's':
+                        tiles.get_sprite().setTextureRect(IntRect(281,1,70,70));
+                        break;
+        // ДОРОГА
+                    case 'r':
+                        tiles.get_sprite().setTextureRect(IntRect(355,1,70,70));
+                        break;
                     }
 
                     tiles.get_sprite().setPosition(j * 64, i * 64);
@@ -474,7 +616,7 @@ void Game::check_attack()
     {
         std::cout << "ATTACK HERO" << std::endl;
         was_attack = false;
-        ACTOR.set_health(ACTOR.get_health() - all_spawn[number_battler]->attack_actor());
+        ACTOR.set_health(ACTOR.get_health() - all_spawn[number_battler]->attack_actor(ACTOR.get_luck(), ACTOR.get_agility()));
     }
 }
 
@@ -523,10 +665,16 @@ void Game::collision_paused(int X, int Y)
     {
         if (Y > 40 && Y < 270)
         {
+            this->save_actor();
             window->setView(window->getDefaultView());
             saver.save_spawn(this->lvl,Cur_level_spawn);
             saver.save_treasure(this->lvl, Cur_level_treasure);
             all_spawn.clear();
+            is_paused = false;
+            is_settings = false;
+            this->set_pause(false);
+            inventory_items.clear();
+            inventory_belt.clear();
             lvl = -1;
         }
         else if (Y > 335 && Y < 565)
@@ -633,15 +781,15 @@ void Game::use_treasure()
         break;
     case '2':
         treasures[1].play_sound();
-        open_chest(6);
+        open_chest(8);
         break;
     case '3':
         treasures[2].play_sound();
-        open_chest(9);
+        open_chest(15);
         break;
     case '4':
         treasures[3].play_sound();
-        add_item(new Golden_key());
+        add_item(new Magic_stone());
         break;
     }
 }
@@ -658,12 +806,24 @@ void Game::open_chest(int rander)
         this->add_item(new Big_Health_potion());
         break;
     case 1:
-        this->add_item(new Armor_rune());
+        this->add_item(new Rune_granite());
         break;
     case 2:
-        this->add_item(new Weapon_rune());
+        this->add_item(new Rune_crystal());
         break;
     case 3:
+        this->add_item(new Rune_endurance());
+        break;
+    case 4:
+        this->add_item(new Rune_strength());
+        break;
+    case 5:
+        this->add_item(new Rune_agility());
+        break;
+    case 6:
+        this->add_item(new Rune_luck());
+        break;
+    case 7: case 8: case 9:
         this->add_item(new Experience_potion());
         break;
     default:
@@ -778,6 +938,7 @@ bool Game::add_belt()
 {
     if (inventory_items[item_number]->get_can_belt() && inventory_belt.size() < MAX_BELT)
     {
+        inventory_items[item_number]->use(ACTOR);
         inventory_belt.push_back(inventory_items[item_number]);
         inventory_items.erase(inventory_items.begin() + item_number);
         item_number = inventory_items.size() - 1;
@@ -786,11 +947,18 @@ bool Game::add_belt()
     return false;
 }
 
+void Game::add_belt_load(Item* rune)
+{
+    rune->use(ACTOR, 1);
+    inventory_belt.push_back(rune);
+}
+
 void Game::pull_belt()
 {
     if (inventory_belt.size())
     {
         this->add_item(inventory_belt[belt_number]);
+        inventory_belt[belt_number]->re_use(ACTOR);
         inventory_belt.erase(inventory_belt.begin() + belt_number);
         belt_number = 0;
     }
@@ -818,18 +986,17 @@ void Game::show_use(int item)
 {
         if (item != -1 && inventory_items.size() && inventory_items[item_number]->get_usable())
         {
-            inventory_items[item_number]->use(ACTOR);
-//            std::cout <<  item << std::endl;
             if (!add_belt() && !inventory_items[item_number]->get_can_belt())
             {
-                 inventory_items.erase(inventory_items.begin() + item_number);
+                inventory_items[item_number]->use(ACTOR);
+                inventory_items.erase(inventory_items.begin() + item_number);
                 item_number = inventory_items.size() - 1;
             }
             if (is_battle)
             {
                 is_inventory = false;
                 is_inventory_items = false;
-                ACTOR.set_health(ACTOR.get_health() - all_spawn[number_battler]->attack_actor());
+                ACTOR.set_health(ACTOR.get_health() - all_spawn[number_battler]->attack_actor(ACTOR.get_luck(), ACTOR.get_agility()));
 
             }
         }
@@ -873,7 +1040,7 @@ void Game::move_spawn()
 {
     for (auto& enemy : all_spawn)
         {
-            enemy->move_to_actor(ACTOR.get_x(), ACTOR.get_y(),this->delta / 4);
+            enemy->move_to_actor(ACTOR.get_x(), ACTOR.get_y(),this->delta / 4, get_tile_walk(enemy->get_x(), enemy->get_y()));
         }
 }
 
@@ -904,7 +1071,7 @@ void Game::show_belt()
     for (auto& item: inventory_belt)
     {
         item->set_need_sprite();
-        item->get_entity().get_sprite().setPosition(inv_tile.get_sprite().getPosition().x + 625 + x_adder,inv_tile.get_sprite().getPosition().y + 500);
+        item->get_entity().get_sprite().setPosition(inv_tile.get_sprite().getPosition().x + 640 + x_adder,inv_tile.get_sprite().getPosition().y + 500);
         window->draw(item->get_entity().get_sprite());
         if (x_adder == (55 * (belt_number + 1)))
         {
@@ -1000,7 +1167,14 @@ void Game::show_inventory()
         points.setString(std::to_string(ACTOR.get_damage()));
                 points.setPosition(inv_tile.get_sprite().getPosition().x + 140,inv_tile.get_sprite().getPosition().y + 140);
         window->draw(points);
-        points.setCharacterSize(80);
+        if (ACTOR.is_boring())
+        {
+            points.setCharacterSize(65);
+            skills.setString(L"УСТАЛОСТЬ");
+                skills.setPosition(inv_tile.get_sprite().getPosition().x + 60,inv_tile.get_sprite().getPosition().y + 260);
+            window->draw(skills);
+        }
+        points.setCharacterSize(77);
         //----------------------------------------------------------------------------------------------------------------
 
         // Количество свободных очков

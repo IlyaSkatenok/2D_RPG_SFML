@@ -1,6 +1,6 @@
 #pragma once
 #include "Entity.h"
-
+// назейр, опедярюбкъчыхи янани янярнъмхе хцпш
 class State
 {
 protected:
