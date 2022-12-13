@@ -37,6 +37,7 @@ private:
     Map game_map;
     Loader loader;
     Saver saver;
+    End end_screen;
 
     Sounding ambient;
     Sounding click_on_button;
@@ -91,6 +92,7 @@ private:
 
     char collision_loot = ' ';
 
+    int actor_start_x, actor_start_y;
 
 
     Font verdana;
@@ -146,7 +148,7 @@ public:
     void choose_skill(bool side);
     void choose_item(bool side);
     void choose_belt(bool side);
-    void pull_belt();
+    void pull_belt(bool is_silent = 0);
 
     bool add_belt();
     void add_belt_load(Item* rune);
@@ -155,7 +157,6 @@ public:
 
     char get_tile_walk();
     char get_tile_walk(float x, float y);
-
 
     void updateDelta();
     void updateEvents();

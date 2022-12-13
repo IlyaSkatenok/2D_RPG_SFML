@@ -54,7 +54,6 @@
 		</Linker>
 		<Unit filename="Actor.cpp" />
 		<Unit filename="Actor.h" />
-		<Unit filename="Camera.h" />
 		<Unit filename="Enemy.cpp" />
 		<Unit filename="Enemy.h" />
 		<Unit filename="Entity.cpp" />
@@ -63,12 +62,11 @@
 		<Unit filename="Game.h" />
 		<Unit filename="Item.cpp" />
 		<Unit filename="Item.h" />
-		<Unit filename="Levels.h" />
 		<Unit filename="Sounding.cpp" />
 		<Unit filename="Sounding.h" />
 		<Unit filename="State.cpp" />
 		<Unit filename="State.h" />
-		<Unit filename="lab1_3.cpp" />
+		<Unit filename="start.cpp" />
 		<Extensions>
 			<lib_finder disable_auto="1" />
 		</Extensions>

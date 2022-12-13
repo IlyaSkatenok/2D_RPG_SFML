@@ -415,13 +415,13 @@
 1669980261 source:d:\games\codeblocks_portable\works\lab_sfml1\lab1_3.cpp
 	"Game.h"
 
-1668348276 source:d:\games\codeblocks_portable\works\lab_sfml1\entity.cpp
+1670521386 source:d:\games\codeblocks_portable\works\lab_sfml1\entity.cpp
 	"Entity.h"
 
-1669983130 source:d:\games\codeblocks_portable\works\lab_sfml1\game.cpp
+1670958921 source:d:\games\codeblocks_portable\works\lab_sfml1\game.cpp
 	"Game.h"
 
-1669982643 d:\games\codeblocks_portable\works\lab_sfml1\game.h
+1670958624 d:\games\codeblocks_portable\works\lab_sfml1\game.h
 	<SFML/Graphics.hpp>
 	<SFML/Audio.hpp>
 	<iostream>
@@ -436,10 +436,10 @@
 	"Actor.h"
 	"State.h"
 
-1669975888 source:d:\games\codeblocks_portable\works\lab_sfml1\state.cpp
+1670959979 source:d:\games\codeblocks_portable\works\lab_sfml1\state.cpp
 	"State.h"
 
-1669906052 d:\games\codeblocks_portable\works\lab_sfml1\state.h
+1670959752 d:\games\codeblocks_portable\works\lab_sfml1\state.h
 	"Entity.h"
 
 1666619241 source:d:\games\codeblocks_portable\works\lab_sfml1\gamestate.cpp
@@ -448,18 +448,18 @@
 1666619171 d:\games\codeblocks_portable\works\lab_sfml1\gamestate.h
 	"State.h"
 
-1669309753 d:\games\codeblocks_portable\works\lab_sfml1\entity.h
+1670669556 d:\games\codeblocks_portable\works\lab_sfml1\entity.h
 	<SFML/Graphics.hpp>
 	<iostream>
 	<fstream>
 	<ctime>
 	"Sounding.h"
 
-1669976312 source:d:\games\codeblocks_portable\works\lab_sfml1\actor.cpp
+1670957165 source:d:\games\codeblocks_portable\works\lab_sfml1\actor.cpp
 	"Actor.h"
 	<iostream>
 
-1669915259 d:\games\codeblocks_portable\works\lab_sfml1\actor.h
+1670684997 d:\games\codeblocks_portable\works\lab_sfml1\actor.h
 	"Entity.h"
 	<vector>
 
@@ -500,14 +500,14 @@
 
 1666799374 d:\games\codeblocks_portable\works\lab_sfml1\levels.h
 
-1669472358 d:\games\codeblocks_portable\works\lab_sfml1\enemy.h
+1670678213 d:\games\codeblocks_portable\works\lab_sfml1\enemy.h
 	"Entity.h"
 
-1669472434 source:d:\games\codeblocks_portable\works\lab_sfml1\enemy.cpp
+1670779530 source:d:\games\codeblocks_portable\works\lab_sfml1\enemy.cpp
 	"Enemy.h"
 	<cmath>
 
-1669978483 d:\games\codeblocks_portable\works\lab_sfml1\item.h
+1670772700 d:\games\codeblocks_portable\works\lab_sfml1\item.h
 	"Actor.h"
 	"Sounding.h"
 
@@ -518,7 +518,7 @@
 	<SFML/Graphics.hpp>
 	"Item.h"
 
-1669979747 source:d:\games\codeblocks_portable\works\lab_sfml1\item.cpp
+1670957346 source:d:\games\codeblocks_portable\works\lab_sfml1\item.cpp
 	"Item.h"
 
 1668780760 d:\games\codeblocks_portable\works\lab_sfml1\settings.h
@@ -635,9 +635,12 @@
 1668952954 d:\games\codeblocks_portable\works\lab_sfml1\music.h
 	<SFML/Audio.hpp>
 
-1669835820 d:\games\codeblocks_portable\works\lab_sfml1\sounding.h
+1670669600 d:\games\codeblocks_portable\works\lab_sfml1\sounding.h
 	<SFML/Audio.hpp>
 
 1669835812 source:d:\games\codeblocks_portable\works\lab_sfml1\sounding.cpp
 	"Sounding.h"
+
+1669980261 source:d:\games\codeblocks_portable\works\lab_sfml1\start.cpp
+	"Game.h"
 

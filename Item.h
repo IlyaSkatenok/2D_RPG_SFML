@@ -17,7 +17,7 @@ public:
         virtual ~Item();
         virtual void use(Actor& hero, bool is_silent = 0) = 0;
         virtual void set_need_sprite() = 0;
-        virtual void re_use(Actor& hero);           // ДЛЯ ПРЕДМЕТОВ С ПОЯСА
+        virtual void re_use(Actor& hero, bool is_silent = 0);           // ДЛЯ ПРЕДМЕТОВ С ПОЯСА
         Entity& get_entity();
         std::wstring get_name();
         std::wstring get_description();
@@ -56,7 +56,7 @@ public:
     Rune_granite();
     void set_need_sprite() override;
     void use(Actor& hero, bool is_silent = 0) override;
-    void re_use(Actor& hero) override;
+    void re_use(Actor& hero, bool is_silent = 0) override;
 };
 
 class Rune_crystal : public Item
@@ -65,7 +65,7 @@ public:
     Rune_crystal();
     void set_need_sprite() override;
     void use(Actor& hero, bool is_silent = 0) override;
-    void re_use(Actor& hero) override;
+    void re_use(Actor& hero, bool is_silent = 0) override;
 };
 
 class Rune_strength : public Item
@@ -74,7 +74,7 @@ public:
     Rune_strength();
     void set_need_sprite() override;
     void use(Actor& hero, bool is_silent = 0) override;
-    void re_use(Actor& hero) override;
+    void re_use(Actor& hero, bool is_silent = 0) override;
 };
 
 class Rune_luck : public Item
@@ -83,7 +83,7 @@ public:
     Rune_luck();
     void set_need_sprite() override;
     void use(Actor& hero, bool is_silent = 0) override;
-    void re_use(Actor& hero) override;
+    void re_use(Actor& hero, bool is_silent = 0) override;
 };
 
 class Rune_endurance : public Item
@@ -92,7 +92,7 @@ public:
     Rune_endurance();
     void set_need_sprite() override;
     void use(Actor& hero, bool is_silent = 0) override;
-    void re_use(Actor& hero) override;
+    void re_use(Actor& hero, bool is_silent = 0) override;
 };
 
 class Rune_agility : public Item
@@ -101,7 +101,7 @@ public:
     Rune_agility();
     void set_need_sprite() override;
     void use(Actor& hero, bool is_silent = 0) override;
-    void re_use(Actor& hero) override;
+    void re_use(Actor& hero, bool is_silent = 0) override;
 };
 
 

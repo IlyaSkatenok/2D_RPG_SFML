@@ -7,19 +7,9 @@ State::State()
     info.setColor(Color(24,240,24));
 }
 
-State::~State()
-{
-
-}
-
 Settings::Settings()
 {
     info.setCharacterSize(60);
-}
-
-Settings::~Settings()
-{
-
 }
 
 void State::set_window(RenderWindow *window)
@@ -30,7 +20,7 @@ void State::set_window(RenderWindow *window)
 void Settings::show(int X, int Y, bool in_menu, bool& is_play_ambient, int& volume_level, int& volume_level_ambient)
 {
     XX = X - 600;
-    YY = Y - 300;
+    YY = Y - 255;
     if(in_menu)
     {
         XX = 200;
@@ -51,10 +41,6 @@ void Settings::show(int X, int Y, bool in_menu, bool& is_play_ambient, int& volu
 
     info.setString(L"ОБЩАЯ ГРОМКОСТЬ");
         info.setPosition(XX,YY + 175);
-    WINDOW->draw(info);
-
-    info.setString(L"ПОЛНЫЙ ЭКРАН");
-        info.setPosition(XX,YY + 250);
     WINDOW->draw(info);
 
     info.setColor(Color(240,20,100));
@@ -104,11 +90,6 @@ Menu::Menu()
         info.setCharacterSize(55);
 }
 
-Menu::~Menu()
-{
-
-}
-
 void Menu::show(int X, int Y, bool is_file, bool is_hide_buttons)
 {
     WINDOW->draw(menu_background.get_sprite());
@@ -153,11 +134,6 @@ Pause::Pause()
         info.setCharacterSize(60);
 }
 
-Pause::~Pause()
-{
-
-}
-
 void Pause::show(int X, int Y)
 {
     pause_menu.get_sprite().setPosition(X - 260 , Y  - 330 );
@@ -187,19 +163,39 @@ Map::Map()
 
 }
 
-Map::~Map()
-{
-
-}
-
 void Map::show(int X, int Y)
 {
     WINDOW->draw(map_menu.get_sprite());
 }
 
+End::End()
+{
+    info.setColor(Color(5,5,5));
+    red_end.get_sprite().setScale(10,10);
+}
+
+void End::show(int X, int Y)
+{
+    red_end.get_sprite().setPosition(X, Y);
+    WINDOW->draw(red_end.get_sprite());
+
+    button_end.get_sprite().setPosition(X + 600, Y + 700);
+    WINDOW->draw(button_end.get_sprite());
+
+    info.setCharacterSize(70);
+    info.setString(L"ВЫ ПРОИГРАЛИ");
+    info.setPosition(X + 500, Y + 100);
+    WINDOW->draw(info);
+
+    info.setCharacterSize(55);
+    info.setString(L"ВЫХОД");
+    info.setPosition(X + 705, Y + 725);
+    WINDOW->draw(info);
+}
+
 bool Loader::is_file_actor()
 {
-    std::ifstream File("./gamedata/configs/actor.txt");
+    std::ifstream File("./gamedata/configs/actor/actor.txt");
     if (File)
     {
         return true;
@@ -207,15 +203,19 @@ bool Loader::is_file_actor()
     return false;
 }
 
-void Loader::load_level(int level, std::string Cur_level[])
+void Loader::load_level(int level, std::string Cur_level[], int& actor_x, int& actor_y)
 {
     std::string need_level = "level" + std::to_string(level);
     std::ifstream File("./gamedata/configs/levels/" + need_level + ".txt");
+    File >> actor_x; File >> actor_y;
+    actor_x *= 64; actor_y *= 64;
     std::string tmp;
+    getline(File,tmp);
     int i = 0;
     while (!File.eof())
     {
         getline(File,tmp);
+        //std::cout << tmp << "<-----" << '\n';
         Cur_level[i] = tmp;
         i++;
     }
@@ -260,6 +260,83 @@ void Loader::load_settings(int& volume_level, int& volume_level_ambient, bool& i
     File >> temp; volume_level_ambient = temp;
     File >> temp; is_play_ambient = temp;
     File.close();
+}
+
+void Loader::reload_all()
+{
+    std::string temp;
+    for (int i = 1; i < 10; i++)
+    {
+        std::ofstream File_w("./gamedata/configs/all_spawns/level_spawn" + std::to_string(i) + ".txt");
+        std::ifstream File_r("./gamedata/configs/all_spawns_back/level_spawn" + std::to_string(i) + ".txt");
+        while (!File_r.eof())
+        {
+            getline(File_r,temp);
+            File_w << temp;
+            if (!File_r.eof())
+            {
+                File_w << '\n';
+            }
+        }
+        File_r.close(); File_w.close();
+    }
+    for (int i = 1; i < 10; i++)
+    {
+        std::ofstream File_w("./gamedata/configs/treasure_spawns/level_treasure" + std::to_string(i) + ".txt");
+        std::ifstream File_r("./gamedata/configs/treasure_spawns_back/level_treasure" + std::to_string(i) + ".txt");
+        while (!File_r.eof())
+        {
+            getline(File_r,temp);
+            File_w << temp;
+            if (!File_r.eof())
+            {
+                File_w << '\n';
+            }
+        }
+        File_r.close(); File_w.close();
+    }
+
+    std::ofstream File_actor_w("./gamedata/configs/actor/actor.txt");
+    std::ifstream File_actor_r("./gamedata/configs/actor_back/actor.txt");
+    while (!File_actor_r.eof())
+    {
+        getline(File_actor_r,temp);
+        File_actor_w << temp;
+        if (!File_actor_r.eof())
+        {
+            File_actor_w << '\n';
+        }
+    }
+
+    File_actor_r.close(); File_actor_w.close();
+
+    std::ofstream File_inv_w("./gamedata/configs/actor/actor_items.txt");
+    std::ifstream File_inv_r("./gamedata/configs/actor_back/actor_items.txt");
+    while (!File_inv_r.eof())
+    {
+        getline(File_inv_r,temp);
+        File_inv_w << temp;
+        if (!File_inv_r.eof())
+        {
+            File_inv_w << '\n';
+        }
+    }
+
+    File_inv_r.close(); File_inv_w.close();
+
+    std::ofstream File_belt_w("./gamedata/configs/actor/actor_belt.txt");
+    std::ifstream File_belt_r("./gamedata/configs/actor_back/actor_belt.txt");
+    while (!File_belt_r.eof())
+    {
+        getline(File_belt_r,temp);
+        File_belt_w << temp;
+        if (!File_belt_r.eof())
+        {
+            File_belt_w << '\n';
+        }
+    }
+
+    File_belt_r.close(); File_belt_w.close();
 }
 
 void Saver::save_settings(int& volume_level, int& volume_level_ambient, bool& is_play_ambient)

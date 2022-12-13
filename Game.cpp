@@ -9,10 +9,13 @@ void Game::initWindow()
     this->window = new RenderWindow(VideoMode(1600,900), "GAME", Style::Close);
     this->window->setFramerateLimit(60);
 
+    std::cout << 0 + '1' << "<_>" << 0 + '5' << "<-->" << 0 + '6' << "----" << 1 + '1' << std::endl;
+
     settings.set_window(window);
     menu.set_window(window);
     pause.set_window(window);
     game_map.set_window(window);
+    end_screen.set_window(window);
 }
 
 Game::Game()
@@ -65,6 +68,13 @@ void Game::updateEvents()
         }
         if (event.type == Event::KeyPressed && !this->was_pressed)
         {
+            int key_code = event.key.code;
+            if (was_attack)
+            {
+                continue;
+            }
+
+
             if (event.key.code == Keyboard::Z && is_inventory_items)
             {
                 choose_belt(1);
@@ -77,30 +87,35 @@ void Game::updateEvents()
             {
                 pull_belt();
             }
-            int key_code = event.key.code;
-            if (was_attack)
-            {
-                continue;
-            }
             if (event.key.code == Keyboard::Escape)
             {
-                if (!is_battle)
+                if (lvl == -1)
                 {
-                    is_inventory = false;
-                    is_inventory_items = false;
                     if (is_settings)
                     {
                         is_settings = false;
                     }
-                    else
-                    {
-                        is_paused = !is_paused;
-                        set_pause(is_paused);
-                    }
                 }
-                if (!lvl)
+                else
                 {
-                    lvl = -1;
+                    if (!is_battle && lvl)
+                    {
+                        is_inventory = false;
+                        is_inventory_items = false;
+                        if (is_settings)
+                        {
+                            is_settings = false;
+                        }
+                        else
+                        {
+                            is_paused = !is_paused;
+                            set_pause(is_paused);
+                        }
+                    }
+                    if (!lvl)
+                    {
+                        lvl = -1;
+                    }
                 }
             }
 
@@ -135,10 +150,13 @@ void Game::updateEvents()
 
                 if (!lvl)
                 {
+                    this->load_actor();
                     ACTOR.get_camera().reset(FloatRect(0,0,1600,900));
                     this->lvl = key_code - 26;
                     loader.load_treasure(lvl, Cur_level_treasure);
-                    loader.load_level(lvl, Cur_level);
+                    loader.load_level(lvl, Cur_level, actor_start_x, actor_start_y);
+                    ACTOR.get_sprite().setPosition(actor_start_x, actor_start_y);
+                    ACTOR.set_x(actor_start_x); ACTOR.set_y(actor_start_y);
                     loader.load_spawn(lvl, Cur_level_spawn);
                     this->fill_all_spawn();
                 }
@@ -265,7 +283,7 @@ void Game::set_pause(bool ispaused)
 
 void Game::load_actor()
 {
-    std::ifstream File("./gamedata/configs/actor.txt");
+    std::ifstream File("./gamedata/configs/actor/actor.txt");
     std::cout << "loaded" << std::endl;
     int temp; // ЛУВС
     File >> temp; ACTOR.set_agility(temp);
@@ -280,7 +298,7 @@ void Game::load_actor()
 
     File.close();
 
-    std::ifstream File2("./gamedata/configs/actor_items.txt");
+    std::ifstream File2("./gamedata/configs/actor/actor_items.txt");
 
     File2 >> temp;
     for (uint16_t i = 0; i < temp; i++){ inventory_items.push_back(new Magic_stone()); }
@@ -310,7 +328,7 @@ void Game::load_actor()
                          );
     item_number = inventory_items.size() - 1;
 
-    std::ifstream File3("./gamedata/configs/actor_belt.txt");
+    std::ifstream File3("./gamedata/configs/actor/actor_belt.txt");
 
     File3 >> temp;
     int temp_temp = temp;
@@ -355,7 +373,7 @@ void Game::save_actor()
     std::wstring temp_wstr;
     std::string temp_str;
 
-    std::ofstream File3("./gamedata/configs/actor_belt.txt");
+    std::ofstream File3("./gamedata/configs/actor/actor_belt.txt");
 
     File3 << inventory_belt.size() << '\n';
     for (int i = 0; i < inventory_belt.size(); i++)
@@ -394,7 +412,7 @@ void Game::save_actor()
 
     File3.close();
 
-    std::ofstream File2("./gamedata/configs/actor_items.txt");
+    std::ofstream File2("./gamedata/configs/actor/actor_items.txt");
 
     File2 << std::count_if(inventory_items.begin(), inventory_items.end(), [](Item* obj) {return (obj->get_name() == L"Волшебный камень");}) << '\n';
     File2 << std::count_if(inventory_items.begin(), inventory_items.end(), [](Item* obj) {return (obj->get_name() == L"Лечебное зелье");}) << '\n';
@@ -412,11 +430,11 @@ void Game::save_actor()
     belt_number = 0;
     while(inventory_belt.size())
     {
-        pull_belt();
+        pull_belt(true);
     }
 
 
-    std::ofstream File("./gamedata/configs/actor.txt");
+    std::ofstream File("./gamedata/configs/actor/actor.txt");
 
     int temp; // ЛУВС
     File << ACTOR.get_agility() << ' ';
@@ -438,9 +456,23 @@ void Game::fill_all_spawn()
     {
             for (int j = 0; j < MAP; j++)
             {
-                if (Cur_level_spawn[i][j] == 'q')
+                switch(Cur_level_spawn[i][j])
                 {
-                    all_spawn.push_back(new Wolf(j * 64, i * 64));
+                case '1':
+                    all_spawn.push_back(new Knight_easy(j * 64, i * 64));
+                    break;
+                case '2':
+                    all_spawn.push_back(new Knight_medium(j * 64, i * 64));
+                    break;
+                case '3':
+                    all_spawn.push_back(new Knight_high(j * 64, i * 64));
+                    break;
+                case '4':
+                    all_spawn.push_back(new Knight_high_2(j * 64, i * 64));
+                    break;
+                case '5':
+                    all_spawn.push_back(new Boss(j * 64, i * 64));
+                    break;
                 }
             }
     }
@@ -459,7 +491,7 @@ char Game::get_tile_walk(float x, float y)
 bool Game::collision()
 {
     // ВЫХОД ЗА КАРТУ
-    if ((ACTOR.get_x() < 64) || ACTOR.get_x() > (64 * MAP) || (ACTOR.get_y() < 64) || (ACTOR.get_y() > (64 * MAP)))
+    if ((ACTOR.get_x() < 32) || ACTOR.get_x() > (64 * MAP -32) || (ACTOR.get_y() < 32) || (ACTOR.get_y() > (64 * MAP - 32)))
     {
         return true;
     }
@@ -499,9 +531,12 @@ bool Game::collision_treasure()
 
 void Game::show_hero()
 {
-    ACTOR.update_camera();
-    window->setView(ACTOR.get_camera());
-    window->draw(ACTOR.get_sprite());
+    if (!ACTOR.get_dead())
+    {
+        ACTOR.update_camera();
+        window->setView(ACTOR.get_camera());
+        window->draw(ACTOR.get_sprite());
+    }
 }
 
 void Game::show_map()
@@ -622,12 +657,11 @@ void Game::check_attack()
 
 void Game::show_battle()
 {
-    if (ACTOR.get_health() < 0)
+    if (ACTOR.get_dead())
     {
-//        ACTOR.set_dead(true);
-//        this->end_battle();
+        end_screen.show(ACTOR.get_camera().getCenter().x - ACTOR.get_camera().getSize().x / 2.f,ACTOR.get_camera().getCenter().y - ACTOR.get_camera().getSize().y / 2.f);
     }
-    if (all_spawn[number_battler]->get_health() > 0)
+    else if (all_spawn[number_battler]->get_health() > 0)
     {
         this->check_attack();
         this->show_battle_gui();
@@ -737,17 +771,12 @@ void Game::collision_menu(int X, int Y)
     {
         if (Y > 150 && Y < 295)
         {
-           //ambient.get_sound().stop();
-           //ambient.set_sound("./gamedata/sounds/game/ambient_map");
-           //ambient.play_sound();
            this->lvl = 0;
-           this->load_actor();
         }
         if (Y > 325 && Y < 475)
         {
             this->lvl = 0;
-            ACTOR.set_skills(1,1,1,1);
-            ACTOR.set_level_points(8);
+            loader.reload_all();
         }
         if (Y > 500 && Y < 645)
         {
@@ -953,12 +982,12 @@ void Game::add_belt_load(Item* rune)
     inventory_belt.push_back(rune);
 }
 
-void Game::pull_belt()
+void Game::pull_belt(bool is_silent)
 {
     if (inventory_belt.size())
     {
         this->add_item(inventory_belt[belt_number]);
-        inventory_belt[belt_number]->re_use(ACTOR);
+        inventory_belt[belt_number]->re_use(ACTOR, is_silent);
         inventory_belt.erase(inventory_belt.begin() + belt_number);
         belt_number = 0;
     }
@@ -1020,7 +1049,7 @@ void Game::end_battle()
         }
         for (int j = 0; j < MAP; j++)
         {
-            if (Cur_level_spawn[i][j] == 'q')
+            if (Cur_level_spawn[i][j] > 48 && Cur_level_spawn[i][j] < 54)
             {
                 counter_battler++;
             }
@@ -1190,29 +1219,35 @@ void Game::show_inventory()
     }
     else
     {
-        skills.setCharacterSize(37);
-        int y_adder = 25;
-        this->show_cur_item();
-        this->show_belt();
-        for (auto item: inventory_items)
+        if (inventory_belt.size())
         {
-            inventory_items_counter[item->get_name()]++;
+            this->show_belt();
         }
-
-        for (auto [name, count]: inventory_items_counter)
+        if (inventory_items.size())
         {
-            if (name == inventory_items[item_number]->get_name())
+            skills.setCharacterSize(37);
+            int y_adder = 25;
+            this->show_cur_item();
+            for (auto item: inventory_items)
             {
-                skills.setColor(Color(150,240,140));
+                inventory_items_counter[item->get_name()]++;
             }
-            skills.setString(name + " " + std::to_string(count));
-                skills.setPosition(inv_tile.get_sprite().getPosition().x + 38,inv_tile.get_sprite().getPosition().y + y_adder);
-            window->draw(skills);
-            skills.setColor(Color(4,4,4));
-            y_adder += 50;
+
+            for (auto [name, count]: inventory_items_counter)
+            {
+                if (name == inventory_items[item_number]->get_name())
+                {
+                    skills.setColor(Color(40,140,50));
+                }
+                skills.setString(name + " " + std::to_string(count));
+                    skills.setPosition(inv_tile.get_sprite().getPosition().x + 38,inv_tile.get_sprite().getPosition().y + y_adder);
+                window->draw(skills);
+                skills.setColor(Color(4,4,4));
+                y_adder += 50;
+            }
+            inventory_items_counter.clear();
+            skills.setCharacterSize(75);
         }
-        inventory_items_counter.clear();
-        skills.setCharacterSize(75);
     }
 }
 

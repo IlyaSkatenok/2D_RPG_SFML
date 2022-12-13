@@ -5,6 +5,7 @@
 #define CONST_DAMAGE 15
 Actor::Actor(String file, int X, int Y, int W, int H):Move_Entity(file, 1, X,Y,W,H, 0,0,0)
 {
+    srand(time(NULL));
     damage = 15;
     max_health = CONST_HEALTH;
     max_experience = 100;
@@ -33,8 +34,9 @@ Actor::~Actor()
 
 void Actor::update_health()
 {
+    bool was_big = (health == max_health);
     max_health = CONST_HEALTH + 5 * strength + 2 * endurance + bonus_health;
-    if (health > max_health)
+    if (was_big)
     {
         health = max_health;
     }
@@ -136,6 +138,11 @@ int Actor::get_endurance()
     return endurance;
 }
 
+bool Actor::get_dead()
+{
+    return is_dead;
+}
+
 void Actor::set_dead(bool isdead)
 {
     this->is_dead = isdead;
@@ -156,6 +163,10 @@ void Actor::set_health(int heal)
     else
     {
         health = heal;
+    }
+    if (health < 1)
+    {
+        is_dead = true;
     }
 }
 

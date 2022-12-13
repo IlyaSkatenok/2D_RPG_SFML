@@ -15,9 +15,32 @@ public:
 
 };
 
-class Wolf : public Enemy
+class Knight_easy : public Enemy
 {
 public:
-    Wolf(int X, int Y);
-    virtual ~Wolf();
+    Knight_easy(int X, int Y);
+};
+
+class Knight_medium : public Enemy
+{
+public:
+    Knight_medium(int X, int Y);
+};
+
+class Knight_high : public Enemy
+{
+public:
+    Knight_high(int X, int Y);
+};
+
+class Knight_high_2 : public Enemy
+{
+public:
+    Knight_high_2(int X, int Y);
+};
+
+class Boss : public Enemy
+{
+public:
+    Boss(int X, int Y);
 };

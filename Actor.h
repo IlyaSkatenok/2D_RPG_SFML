@@ -54,6 +54,8 @@ public:
     int get_agility();
     int get_endurance();
 
+    bool get_dead();
+
     int get_max_health();
     void set_health(int heal);
     void set_max_health(int heal);

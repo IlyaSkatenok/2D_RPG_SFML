@@ -65,7 +65,7 @@ Entity& Item::get_entity()
     return *logo_item;
 }
 
-void Item::re_use(Actor& hero)
+void Item::re_use(Actor& hero, bool is_silent)
 {
 
 }
@@ -154,12 +154,15 @@ void Rune_granite::use(Actor& hero, bool is_silent)
     }
 }
 
-void Rune_granite::re_use(Actor& hero)
+void Rune_granite::re_use(Actor& hero, bool is_silent)
 {
     hero.set_bonus_damage(hero.get_bonus_damage() + 12);
     hero.set_bonus_health(hero.get_bonus_health() - 20);
-    hero.set_endurance(hero.get_endurance() + 2);
-    item_sounds[3].play_sound();
+    hero.set_endurance(hero.get_endurance() - 2);
+    if (!is_silent)
+    {
+        item_sounds[3].play_sound();
+    }
 }
 
 void Rune_granite::set_need_sprite()
@@ -187,12 +190,15 @@ void Rune_crystal::use(Actor& hero, bool is_silent)
     }
 }
 
-void Rune_crystal::re_use(Actor& hero)
+void Rune_crystal::re_use(Actor& hero, bool is_silent)
 {
     hero.set_bonus_damage(hero.get_bonus_damage() - 20);
     hero.set_bonus_health(hero.get_bonus_health() + 20);
     hero.set_endurance(hero.get_endurance() + 1);
-    item_sounds[3].play_sound();
+    if (!is_silent)
+    {
+        item_sounds[3].play_sound();
+    }
 }
 
 void Rune_crystal::set_need_sprite()
@@ -216,10 +222,13 @@ void Rune_strength::use(Actor& hero, bool is_silent)
     }
 }
 
-void Rune_strength::re_use(Actor& hero)
+void Rune_strength::re_use(Actor& hero, bool is_silent)
 {
     hero.set_strength(hero.get_strength() - 2);
-    item_sounds[3].play_sound();
+    if (!is_silent)
+    {
+        item_sounds[3].play_sound();
+    }
 }
 
 void Rune_strength::set_need_sprite()
@@ -243,10 +252,13 @@ void Rune_luck::use(Actor& hero, bool is_silent)
     }
 }
 
-void Rune_luck::re_use(Actor& hero)
+void Rune_luck::re_use(Actor& hero, bool is_silent)
 {
     hero.set_luck(hero.get_luck() - 2);
-    item_sounds[3].play_sound();
+    if (!is_silent)
+    {
+        item_sounds[3].play_sound();
+    }
 }
 
 void Rune_luck::set_need_sprite()
@@ -270,10 +282,13 @@ void Rune_endurance::use(Actor& hero, bool is_silent)
     }
 }
 
-void Rune_endurance::re_use(Actor& hero)
+void Rune_endurance::re_use(Actor& hero, bool is_silent)
 {
     hero.set_endurance(hero.get_endurance() - 2);
-    item_sounds[3].play_sound();
+    if (!is_silent)
+    {
+        item_sounds[3].play_sound();
+    }
 }
 
 void Rune_endurance::set_need_sprite()
@@ -297,10 +312,13 @@ void Rune_agility::use(Actor& hero, bool is_silent)
     }
 }
 
-void Rune_agility::re_use(Actor& hero)
+void Rune_agility::re_use(Actor& hero, bool is_silent)
 {
     hero.set_agility(hero.get_agility() - 2);
-    item_sounds[3].play_sound();
+    if (!is_silent)
+    {
+        item_sounds[3].play_sound();
+    }
 }
 
 void Rune_agility::set_need_sprite()
